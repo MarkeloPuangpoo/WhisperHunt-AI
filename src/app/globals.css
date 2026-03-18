@@ -1,26 +1,55 @@
 @import "tailwindcss";
 
+@theme {
+  --color-indigo-50: #f5f7ff;
+  --color-indigo-100: #ebf0ff;
+  --color-indigo-200: #d6e0ff;
+  --color-indigo-300: #adc2ff;
+  --color-indigo-400: #85a3ff;
+  --color-indigo-500: #5c85ff;
+  --color-indigo-600: #4f46e5;
+  --color-indigo-700: #4338ca;
+  --color-indigo-800: #3730a3;
+  --color-indigo-900: #312e81;
+
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+}
+
 :root {
   --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --foreground: #0f172a;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@utility bg-mesh {
+  background-color: #ffffff;
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(253,16%,7%,0.05) 0, transparent 50%), 
+    radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%), 
+    radial-gradient(at 100% 0%, hsla(339,49%,30%,0.05) 0, transparent 50%);
+  background-attachment: fixed;
+}
+
+@utility glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+@utility animate-float {
+  animation: float 6s ease-in-out infinite;
 }

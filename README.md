@@ -37,8 +37,8 @@ graph TD
 
     subgraph "The Brain"
         API[FastAPI Gateway]:::backend
-        EMB[text-embedding-004]:::ai
-        GEN[Gemini 2.0 Flash]:::ai
+        EMB[gemini-embedding-001]:::ai
+        GEN[Gemini 2.5 Flash]:::ai
     end
 
     subgraph "The Memory"
@@ -94,8 +94,8 @@ graph TD
 
 *   **Frontend Ecosystem:** Next.js 15 (App Router), React 19 (Concurrent Mode), Tailwind CSS 4 (Zero-runtime), Lucide Icons.
 *   **AI Pipeline:** 
-    *   `Gemini 2.0 Flash`: High-speed semantic clustering & reasoning.
-    *   `text-embedding-004`: Professional-grade 768d vector embeddings.
+    *   `Gemini 2.5 Flash`: High-speed semantic clustering & reasoning.
+    *   `gemini-embedding-001`: Professional-grade 768d vector embeddings.
 *   **Data Layer:** PostgreSQL on Supabase, `pgvector` for similarity calculations, and SQL RPC for high-performance RAG retrieval.
 
 ---

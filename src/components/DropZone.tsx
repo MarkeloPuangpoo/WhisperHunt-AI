@@ -8,6 +8,7 @@ import { uploadSlide } from "@/lib/api";
 type UploadStatus = "idle" | "dragging" | "uploading" | "success" | "error";
 
 interface DropZoneProps {
+  classId: string;
   onUploadSuccess?: () => void;
 }
 
@@ -34,7 +35,7 @@ function FileIcon() {
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 
-export default function DropZone({ onUploadSuccess }: DropZoneProps) {
+export default function DropZone({ classId, onUploadSuccess }: DropZoneProps) {
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [fileName, setFileName] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -51,7 +52,7 @@ export default function DropZone({ onUploadSuccess }: DropZoneProps) {
       setErrorMsg(null);
       setStatus("uploading");
       try {
-        await uploadSlide(file);
+        await uploadSlide(classId, file);
         setStatus("success");
         onUploadSuccess?.();
       } catch {
@@ -59,7 +60,7 @@ export default function DropZone({ onUploadSuccess }: DropZoneProps) {
         setStatus("error");
       }
     },
-    [onUploadSuccess]
+    [classId, onUploadSuccess]
   );
 
   // Drag-and-drop handlers

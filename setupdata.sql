@@ -6,6 +6,8 @@ CREATE EXTENSION IF NOT EXISTS vector;
 -- Table: classes (เก็บข้อมูลห้องเรียน / เซสชันการสอน)
 CREATE TABLE classes (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    teacher_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    -- ผูกกับบัญชีผู้ใช้ใน Supabase
     teacher_name TEXT NOT NULL,
     subject_name TEXT NOT NULL,
     status TEXT DEFAULT 'active',
@@ -13,14 +15,13 @@ CREATE TABLE classes (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 -- Table: slides (เก็บเนื้อหาที่สกัดจาก PDF และ Vector Embeddings)
--- หมายเหตุ: โมเดล Embedding ของ Gemini (เช่น text-embedding-004) จะมีขนาด 768 มิติ
 CREATE TABLE slides (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     class_id UUID REFERENCES classes(id) ON DELETE CASCADE,
     page_number INTEGER NOT NULL,
     chunk_text TEXT NOT NULL,
     embedding VECTOR(768),
-    -- ขนาด Vector อิงตามโมเดลที่ใช้
+    -- ขนาด Vector อิงตามโมเดล gemini-embedding-001
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 -- Table: questions (เก็บคำถามหรือ Feedback ที่เด็กส่งเข้ามา)

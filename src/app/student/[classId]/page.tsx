@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useParams } from "next/navigation";
 import { askQuestion } from "@/lib/api";
 import Toast from "@/components/Toast";
 
@@ -150,6 +151,8 @@ interface ToastState {
 const QUICK_REACT_MESSAGE = "หนูงงสไลด์หน้านี้ค่ะ 🥺";
 
 export default function StudentPage() {
+  const params = useParams();
+  const classId = params.classId as string;
   const [loading, setLoading] = useState(false);
   const [toasts, setToasts] = useState<ToastState[]>([]);
 
@@ -165,12 +168,13 @@ export default function StudentPage() {
   }, []);
 
   const sendQuestion = async (question: string) => {
+    if (!classId) return;
     setLoading(true);
     try {
-      await askQuestion({ question, student_id: "anonymous" });
+      await askQuestion({ class_id: classId, question, student_id: "anonymous" });
       addToast("ส่งให้ครูแล้วจ้า 🚀", "success");
-    } catch {
-      addToast("ส่งไม่สำเร็จ ลองใหม่อีกทีน้า 😢", "error");
+    } catch (e: any) {
+      addToast(e.message || "ส่งไม่สำเร็จ ลองใหม่อีกทีน้า 😢", "error");
     } finally {
       setLoading(false);
     }

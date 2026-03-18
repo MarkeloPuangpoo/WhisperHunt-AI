@@ -1,7 +1,7 @@
 import os
 import traceback
 import json
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import PyPDF2
@@ -42,18 +42,48 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class CreateClassRequest(BaseModel):
+    teacher_name: str
+    subject_name: str
+    teacher_id: str = None
+
 class QuestionRequest(BaseModel):
+    class_id: str
     question: str
     student_id: str = "anonymous"
 
-# ==========================================
-# Helper: ดึง ID ของห้องเรียนล่าสุด
-# ==========================================
-def get_latest_class_id():
-    res = supabase.table("classes").select("id").order("created_at", desc=True).limit(1).execute()
-    if res.data:
-        return res.data[0]["id"]
-    return None
+class ProcessClustersRequest(BaseModel):
+    class_id: str
+
+@app.post("/create-class")
+def create_class(req: CreateClassRequest):
+    """ครูกดสร้างห้องเรียนใหม่ จะได้ UUID คืนกลับไปทำลิงก์"""
+    data = {
+        "teacher_name": req.teacher_name,
+        "subject_name": req.subject_name,
+        "status": "active"
+    }
+    if req.teacher_id:
+        data["teacher_id"] = req.teacher_id
+        
+    res = supabase.table("classes").insert(data).execute()
+    class_id = res.data[0]["id"]
+    return {"status": "success", "class_id": class_id}
+
+@app.post("/end-class/{class_id}")
+def end_class(class_id: str):
+    """เปลี่ยนสถานะห้องเรียนเป็น ended นักเรียนจะถามเพิ่มไม่ได้"""
+    supabase.table("classes").update({"status": "ended"}).eq("id", class_id).execute()
+    return {"status": "success", "message": "ปิดคลาสเรียนเรียบร้อย"}
+
+@app.get("/get-classes")
+def get_classes(teacher_id: str = None):
+    """ดึงรายการห้องเรียนทั้งหมดของครู"""
+    query = supabase.table("classes").select("*").order("created_at", desc=True)
+    if teacher_id:
+        query = query.eq("teacher_id", teacher_id)
+    res = query.execute()
+    return {"status": "success", "classes": res.data}
 
 # ==========================================
 # 2. API Endpoints
@@ -64,18 +94,19 @@ def read_root():
     return {"status": "online", "message": "WhisperHunt Backend is connected to Supabase 🚀"}
 
 @app.post("/upload-slide")
-async def upload_slide(file: UploadFile = File(...)):
-    """รับ PDF -> หั่นทีละหน้า -> แปลงเป็น Vector -> เก็บลง Supabase"""
+async def upload_slide(
+    class_id: str = Form(...),
+    file: UploadFile = File(...)
+):
+    """รับ PDF -> หั่นทีละหน้า -> แปลงเป็น Vector -> เก็บลง Supabase (ระบุ class_id)"""
     if not file.filename.endswith('.pdf'):
         raise HTTPException(status_code=400, detail="กรุณาอัปโหลดไฟล์ PDF เท่านั้น")
 
     try:
-        # 1. สร้างห้องเรียนใหม่ทุกครั้งที่อัปโหลดสไลด์ใหม่ (สำหรับ Demo)
-        class_res = supabase.table("classes").insert({
-            "teacher_name": "Teacher",
-            "subject_name": file.filename
-        }).execute()
-        class_id = class_res.data[0]["id"]
+        # 1. ตรวจสอบว่าคลาสมีอยู่จริง
+        class_check = supabase.table("classes").select("id").eq("id", class_id).execute()
+        if not class_check.data:
+            raise HTTPException(status_code=404, detail="ไม่พบห้องเรียนนี้")
 
         # 2. อ่านไฟล์ PDF
         pdf_reader = PyPDF2.PdfReader(file.file)
@@ -87,11 +118,14 @@ async def upload_slide(file: UploadFile = File(...)):
             if not chunk_text.strip():
                 continue
 
-            # เรียกใช้โมเดล Embedding ของ Google (768 มิติ)
+            # เรียกใช้โมเดล Embedding ของ Google (ปรับเป็นรุ่นใหม่และล็อกขนาดมิติ)
             embed_res = ai_client.models.embed_content(
-                model='text-embedding-004',
+                model='gemini-embedding-001',
                 contents=chunk_text,
-                config=types.EmbedContentConfig(task_type='RETRIEVAL_DOCUMENT')
+                config=types.EmbedContentConfig(
+                    task_type='RETRIEVAL_DOCUMENT',
+                    output_dimensionality=768
+                )
             )
             embedding_vector = embed_res.embeddings[0].values
 
@@ -112,16 +146,20 @@ async def upload_slide(file: UploadFile = File(...)):
 
 @app.post("/ask-question")
 def ask_question(req: QuestionRequest):
-    """รับคำถามจากเด็กนักเรียน แล้วเก็บลง Supabase Table 'questions'"""
+    """รับคำถามจากเด็กนักเรียน โดยระบุ class_id และเช็กสถานะ class"""
     if not req.question.strip():
         raise HTTPException(status_code=400, detail="คำถามว่างเปล่าไม่ได้")
 
-    class_id = get_latest_class_id()
-    if not class_id:
-        raise HTTPException(status_code=400, detail="ครูยังไม่ได้สร้างห้องเรียน/อัปโหลดสไลด์")
+    # เช็กว่าคลาสยัง active อยู่ไหม
+    class_res = supabase.table("classes").select("status").eq("id", req.class_id).execute()
+    if not class_res.data:
+        raise HTTPException(status_code=404, detail="ไม่พบห้องเรียนนี้")
+    
+    if class_res.data[0]["status"] != "active":
+        raise HTTPException(status_code=400, detail="ห้องเรียนนี้ปิดรับคำถามแล้ว")
 
     supabase.table("questions").insert({
-        "class_id": class_id,
+        "class_id": req.class_id,
         "student_message": req.question,
         "is_clustered": False
     }).execute()
@@ -129,13 +167,11 @@ def ask_question(req: QuestionRequest):
     return {"status": "success", "message": "ส่งคำถามสำเร็จ"}
 
 @app.post("/process-clusters")
-def process_clusters():
-    """RAG ของจริง: ค้นหาสไลด์ที่ตรงกับคำถาม -> ส่งให้ Gemini จัดกลุ่ม -> บันทึกลง DB"""
-    class_id = get_latest_class_id()
-    if not class_id:
-        raise HTTPException(status_code=400, detail="ไม่มีห้องเรียนที่เปิดใช้งาน")
+def process_clusters(req: ProcessClustersRequest):
+    """RAG: ประมวลผลเฉพาะ class_id ที่ระบุ"""
+    class_id = req.class_id
 
-    # 1. ดึงคำถามที่ยังไม่ได้จัดกลุ่มออกมา
+    # 1. ดึงคำถามที่ยังไม่ได้จัดกลุ่มออกมา (เฉพาะห้องนี้)
     q_res = supabase.table("questions").select("*").eq("class_id", class_id).eq("is_clustered", False).execute()
     questions = q_res.data
 
@@ -146,11 +182,14 @@ def process_clusters():
     questions_text = "\n".join([f"- {q['student_message']}" for q in questions])
 
     try:
-        # 2. แปลงคำถามรวมเป็น Vector
+        # 2. แปลงคำถามรวมเป็น Vector (ปรับเป็นรุ่นใหม่และล็อกขนาดมิติ)
         embed_res = ai_client.models.embed_content(
-            model='text-embedding-004',
+            model='gemini-embedding-001',
             contents=questions_text,
-            config=types.EmbedContentConfig(task_type='RETRIEVAL_QUERY')
+            config=types.EmbedContentConfig(
+                task_type='RETRIEVAL_QUERY',
+                output_dimensionality=768
+            )
         )
         # แปลงเป็น plain Python list ก่อนส่งเป็น JSON payload
         query_embedding = list(embed_res.embeddings[0].values)
@@ -199,7 +238,7 @@ def process_clusters():
         """
 
         response = ai_client.models.generate_content(
-            model='gemini-2.0-flash',
+            model='gemini-2.5-flash',
             contents=prompt,
             config=types.GenerateContentConfig(response_mime_type="application/json")
         )
@@ -230,17 +269,11 @@ def process_clusters():
         traceback.print_exc()  # พิมพ์ traceback จริงๆ ออก uvicorn log
         raise HTTPException(status_code=500, detail=f"AI/DB Error: {str(e)}")
 
-@app.get("/get-clusters")
-def get_clusters():
-    """ดึงข้อมูลจาก DB มาแสดงบน Dashboard ครู"""
-    class_id = get_latest_class_id()
-    if not class_id:
-        return {"status": "success", "data": {"clusters": []}}
-
-    # ดึง Cluster ของห้องเรียนปัจจุบัน
+@app.get("/get-clusters/{class_id}")
+def get_clusters(class_id: str):
+    """ดึงข้อมูลจาก DB มาแสดงบน Dashboard ครู เฉพาะคลาส"""
     res = supabase.table("clusters").select("*").eq("class_id", class_id).order("created_at", desc=True).execute()
 
-    # แปลงกลับให้อยู่ในรูปแบบที่ Frontend หวังผล
     formatted_clusters = [
         {
             "issue": c["issue_summary"],
