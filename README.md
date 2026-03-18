@@ -1,12 +1,20 @@
-# 🤫 WhisperHunt AI
-### *Bridging the Silence in the Classroom with RAG & Gemini 2.0*
+# 🤫 WhisperHunt AI v1.1
+### *Bridging the Silence in the Classroom with RAG & Gemini 2.5 Flash*
 
-[![Next.js 15](https://img.shields.io/badge/Frontend-Next.js%2015-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![Next.js 16](https://img.shields.io/badge/Frontend-Next.js%2016-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Gemini AI](https://img.shields.io/badge/AI-Gemini%202.0%20Flash-blue?style=for-the-badge&logo=google-gemini)](https://deepmind.google/technologies/gemini/)
+[![Gemini AI](https://img.shields.io/badge/AI-Gemini%202.5%20Flash-blue?style=for-the-badge&logo=google-gemini)](https://deepmind.google/technologies/gemini/)
 [![Supabase](https://img.shields.io/badge/Database-Supabase%20(pgvector)-3ECF8E?style=for-the-badge&logo=supabase)](https://supabase.com/)
 
 **WhisperHunt AI** transforms passive classrooms into data-driven learning environments. By leveraging **Retrieval-Augmented Generation (RAG)**, it captures anonymous student feedback, maps it to specific lecture slides via vector search, and delivers high-impact "Insight Clusters" to teachers in real-time.
+
+---
+
+## 🚀 What's New in v1.1
+- **Next.js 16 & Tailwind CSS 4:** Bleeding-edge frontend performance and styling.
+- **Gemini 2.5 Flash Integration:** Faster, more accurate semantic clustering and re-explanation strategies.
+- **Quick React (🥺):** One-tap signaling for instant "I'm lost" feedback.
+- **AI Insight Board:** Live dashboard with priority heatmaps and slide-mapped confusion clusters.
 
 ---
 
@@ -14,7 +22,7 @@
 
 | 🛡️ Radical Anonymity | 🧠 Semantic Intelligence | ⚡ Real-Time Pulse |
 | :--- | :--- | :--- |
-| Students speak freely without the fear of judgment. | AI doesn't just list questions; it understands *why* they are confused. | Live dashboards that update every 5 seconds to catch confusion as it happens. |
+| Students speak freely without fear of judgment. No login required. | AI doesn't just list questions; it understands *why* they are confused. | Live dashboards that update every 5 seconds to catch confusion as it happens. |
 
 ---
 
@@ -47,16 +55,16 @@ graph TD
     end
 
     %% Flows
-    T -- "Upload Slide" --> API
-    API -- "Embedding" --> EMB
+    T -- "Upload Slide (PDF)" --> API
+    API -- "Embedding (768d)" --> EMB
     EMB -- "Vector Index" --> DB
 
-    S -- "Whisper (Question)" --> API
+    S -- "Whisper (Anonymous)" --> API
     API -- "Persist" --> DB
 
     T -- "Trigger Insights" --> API
-    API -- "Retrieve Context" --> VEC
-    VEC -- "Relevant Chunks" --> GEN
+    API -- "Vector Search (RAG)" --> VEC
+    VEC -- "Context Chunks" --> GEN
     GEN -- "Clustered Insights" --> T
 ```
 
@@ -64,39 +72,33 @@ graph TD
 
 ## 📽️ Experience Walkthrough
 
-### 🎓 Phase 1: Student Whisper (`/student`)
+### 🎓 Student Experience (`/student/[classId]`)
 *Minimalist, mobile-first interface designed for zero friction.*
 
-> [!TIP]
-> **Slide 1: Low-Barrier Engagement**
-> - **One-Tap Confusion:** Use the 🥺 button for instant signaling.
-> - **Animated Feedback:** Tactile UI responses and "Sent to Teacher" (ส่งให้ครูแล้วจ้า 🚀) toasts.
-> - **Dark/Light Harmony:** Designed to look great on any device under classroom lighting.
+- **One-Tap Confusion:** The `🥺 จารย์งงจัง!` button sends an instant signal.
+- **Detailed Whispers:** Type specific questions anonymously.
+- **Real-time Feedback:** Tactile UI responses with toast notifications (ส่งให้ครูแล้วจ้า 🚀).
 
----
-
-### 🧑‍🏫 Phase 2: Teacher Intelligence (`/teacher`)
+### 🧑‍🏫 Teacher Dashboard (`/teacher/class/[classId]`)
 *Mission-control for educators with automated slide-to-question mapping.*
 
-> [!IMPORTANT]
-> **Slide 2: Knowledge Injection (PDF RAG)**
-> - **Smart Upload:** Drag your lecture PDF. The system automatically performs OCR and vectorizes content page-by-page.
-> - **Glassmorphism UI:** Modern, translucent sidebar and cards for a premium desktop feel.
-
-> [!NOTE]
-> **Slide 3: Insight Clustering**
-> - **Priority Heatmap:** Cards change from Sky 🔵 to Amber 🟡 to Fire 🔴 based on student count.
-> - **Bridge the Gap:** AI identifies exactly which slide corresponds to the confusion and suggests a specific re-explanation strategy.
+- **Knowledge Injection (PDF RAG):** Upload lecture PDFs. System performs OCR and vectorizes content page-by-page (768-dimension vectors).
+- **AI Insight Board:** 
+    - **Clustered Issues:** AI groups similar student questions into logical "Issue Clusters".
+    - **Slide Mapping:** Automatically identifies which slide corresponds to the confusion.
+    - **Actionable Suggestions:** Provides specific strategies to re-explain the concept.
+- **Live Stats:** Monitor total signals and urgent issues in real-time.
 
 ---
 
-## 🛠️ Tech Stack Evolution
+## 🛠️ Tech Stack
 
-*   **Frontend Ecosystem:** Next.js 15 (App Router), React 19 (Concurrent Mode), Tailwind CSS 4 (Zero-runtime), Lucide Icons.
-*   **AI Pipeline:** 
+*   **Frontend:** Next.js 16 (App Router), React 19, Tailwind CSS 4, Lucide Icons.
+*   **Backend:** FastAPI (Python 3), PyPDF2 for OCR/Extraction.
+*   **AI Engine:** 
     *   `Gemini 2.5 Flash`: High-speed semantic clustering & reasoning.
     *   `gemini-embedding-001`: Professional-grade 768d vector embeddings.
-*   **Data Layer:** PostgreSQL on Supabase, `pgvector` for similarity calculations, and SQL RPC for high-performance RAG retrieval.
+*   **Data Layer:** Supabase (PostgreSQL) with `pgvector` for similarity calculations and custom SQL RPC for RAG retrieval.
 
 ---
 
@@ -111,16 +113,20 @@ SUPABASE_KEY=your_key
 ```
 
 ### 2. Database Sync
-Apply the `setupdata.sql` in Supabase to enable the `vector` extension and the custom `match_slides` function.
+Apply `setupdata.sql` in the Supabase SQL Editor to:
+1. Enable `pgvector`.
+2. Create `classes`, `slides`, `questions`, and `clusters` tables.
+3. Deploy the `match_slides` RAG function.
 
-### 3. Ignition
+### 3. Run Locally
 ```bash
 # Terminal 1: Backend
-cd backend && uvicorn ai:app --reload
+cd backend && pip install -r requirements.txt
+uvicorn ai:app --reload
 
 # Terminal 2: Frontend
 npm install && npm run dev
 ```
 
 ---
-*Developed with a focus on Pedagogy and AI Excellence.*
+*Developed for **OTTC Hackathon 2026** · Focused on Pedagogy and AI Excellence.*
