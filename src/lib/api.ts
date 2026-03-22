@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = "/api";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -6,6 +6,11 @@ export interface AskQuestionPayload {
   class_id: string;
   question: string;
   student_id: string;
+}
+
+export interface AskQuestionResponse {
+  status: string;
+  message: string;
 }
 
 export interface CreateClassPayload {
