@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { askQuestion } from "@/lib/api";
 import Toast from "@/components/Toast";
+import { Send, Sparkles } from "lucide-react";
 
 // ─── Quick React Button ────────────────────────────────────────────────────────
 
@@ -30,28 +31,29 @@ function QuickReactButton({
       disabled={loading}
       aria-label="ส่งสัญญาณว่างงให้ครู"
       className={`
-        group relative flex flex-col items-center justify-center gap-3
-        w-full rounded-3xl border-2 border-indigo-200 bg-white
-        px-6 py-8 shadow-lg
-        transition-all duration-200 ease-out
-        hover:border-indigo-400 hover:shadow-indigo-100 hover:shadow-xl hover:-translate-y-1
-        active:scale-95
+        group relative flex flex-col items-center justify-center gap-4
+        w-full rounded-[1.75rem] bg-white/70 backdrop-blur-xl
+        ring-1 ring-indigo-200/60 
+        px-6 py-10 shadow-lg shadow-indigo-100/30
+        transition-all duration-300 ease-out
+        hover:ring-indigo-400 hover:shadow-xl hover:shadow-indigo-100/50 hover:-translate-y-1 hover:bg-white/90
+        active:scale-[0.97]
         disabled:opacity-60 disabled:cursor-not-allowed
-        ${pressed ? "scale-95 border-indigo-500 bg-indigo-50" : ""}
+        ${pressed ? "scale-[0.97] ring-indigo-500 bg-indigo-50/80" : ""}
       `}
     >
       {/* Ripple ring animation on press */}
       {pressed && (
         <span
-          className="absolute inset-0 rounded-3xl border-4 border-indigo-400 animate-ping opacity-75"
+          className="absolute inset-0 rounded-[1.75rem] border-4 border-indigo-400 animate-ping opacity-75"
           aria-hidden
         />
       )}
 
       <span
         className={`
-          text-6xl select-none transition-transform duration-300
-          ${pressed ? "scale-125" : "group-hover:scale-110"}
+          text-7xl select-none transition-transform duration-300
+          ${pressed ? "scale-125 rotate-12" : "group-hover:scale-110 group-hover:-rotate-6"}
         `}
       >
         🥺
@@ -60,13 +62,13 @@ function QuickReactButton({
       <span className="text-center font-bold text-indigo-700 text-base leading-snug">
         จารย์งงจัง!
         <br />
-        <span className="font-normal text-indigo-500 text-sm">
+        <span className="font-medium text-indigo-400 text-sm">
           (กดปุ่มนี้เพื่อส่งสัญญาณ)
         </span>
       </span>
 
       {loading && (
-        <span className="absolute top-3 right-4 h-4 w-4 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin" />
+        <span className="absolute top-4 right-5 h-5 w-5 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin" />
       )}
     </button>
   );
@@ -92,38 +94,38 @@ function QuestionForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      <label
-        htmlFor="question-input"
-        className="text-sm font-semibold text-slate-600"
-      >
-        หรือจะพิมพ์คำถามของหนูก็ได้น้า 📝
-      </label>
-      <textarea
-        id="question-input"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        disabled={loading}
-        placeholder="เช่น &quot;สไลด์หน้า 3 ไม่เข้าใจตรงที่อาจารย์พูดเรื่อง...&quot;"
-        rows={4}
-        className="
-          w-full resize-none rounded-2xl border-2 border-slate-200 bg-white
-          p-4 text-slate-800 text-sm leading-relaxed placeholder:text-slate-400
-          outline-none transition-all duration-200
-          focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50
-          disabled:opacity-60
-        "
-      />
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <div className="relative">
+        <textarea
+          id="question-input"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          disabled={loading}
+          placeholder={`เช่น "สไลด์หน้า 3 ไม่เข้าใจตรงที่อาจารย์พูดเรื่อง..."`}
+          rows={4}
+          className="
+            w-full resize-none rounded-2xl bg-white/70 backdrop-blur-xl
+            ring-1 ring-slate-200/60 
+            p-5 text-slate-800 text-sm leading-relaxed placeholder:text-slate-400
+            outline-none transition-all duration-300
+            focus:ring-2 focus:ring-indigo-400 focus:bg-white/90 focus:shadow-lg focus:shadow-indigo-100/30
+            disabled:opacity-60
+          "
+        />
+      </div>
       <button
         id="submit-question-btn"
         type="submit"
         disabled={!text.trim() || loading}
         className="
-          relative w-full rounded-2xl bg-indigo-600 py-4 px-6
-          font-bold text-white text-base shadow-md shadow-indigo-200
-          transition-all duration-200 ease-out
-          hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-200 hover:-translate-y-0.5
-          active:scale-95 active:translate-y-0
+          relative w-full rounded-2xl 
+          bg-gradient-to-r from-indigo-600 to-violet-600 
+          py-4 px-6
+          font-bold text-white text-base 
+          shadow-lg shadow-indigo-200/50
+          transition-all duration-300 ease-out
+          hover:shadow-xl hover:shadow-indigo-300/50 hover:-translate-y-0.5
+          active:scale-[0.97] active:translate-y-0
           disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none
         "
       >
@@ -133,7 +135,10 @@ function QuestionForm({
             กำลังส่ง...
           </span>
         ) : (
-          "ส่งคำถาม 🚀"
+          <span className="flex items-center justify-center gap-2">
+            <Send className="h-4 w-4" />
+            ส่งคำถาม
+          </span>
         )}
       </button>
     </form>
@@ -173,8 +178,9 @@ export default function StudentPage() {
     try {
       await askQuestion({ class_id: classId, question, student_id: "anonymous" });
       addToast("ส่งให้ครูแล้วจ้า 🚀", "success");
-    } catch (e: any) {
-      addToast(e.message || "ส่งไม่สำเร็จ ลองใหม่อีกทีน้า 😢", "error");
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "ส่งไม่สำเร็จ ลองใหม่อีกทีน้า 😢";
+      addToast(msg, "error");
     } finally {
       setLoading(false);
     }
@@ -185,38 +191,35 @@ export default function StudentPage() {
 
   return (
     <>
-      {/* ── Background gradient ───────────────────────────────────────── */}
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-violet-50">
+      {/* ── Background ───────────────────────────────────────── */}
+      <div className="min-h-screen bg-mesh">
         {/* ── Safe area wrapper (mobile-first, max 480 px) ───────────── */}
-        <div className="mx-auto flex min-h-screen max-w-sm flex-col px-5 pb-10 pt-6">
+        <div className="mx-auto flex min-h-screen max-w-sm flex-col px-5 pb-10 pt-8">
 
           {/* ── Hero Section ──────────────────────────────────────────── */}
-          <div className="mb-8 text-center">
+          <div className="mb-10 text-center animate-fade-in-up">
             {/* Badge */}
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-indigo-100 px-4 py-1.5 text-xs font-semibold text-indigo-700 ring-1 ring-indigo-200">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-500 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-indigo-600" />
-              </span>
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-50 to-violet-50 px-4 py-2 text-xs font-bold text-indigo-600 ring-1 ring-indigo-200/60 shadow-sm">
+              <Sparkles className="h-3.5 w-3.5" />
               ไม่ระบุตัวตน · Anonymous
             </div>
 
-            <h1 className="text-2xl font-extrabold leading-tight tracking-tight text-slate-800">
+            <h1 className="text-[1.65rem] font-extrabold leading-tight tracking-tight text-slate-800">
               มีอะไรที่เรียนแล้วงง
               <br />
               พิมพ์มาได้เลย{" "}
               <span className="inline-block animate-bounce">🤫</span>
             </h1>
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-3 text-sm text-slate-500 font-medium">
               ไม่มีใครรู้ว่าใครส่ง — ถามได้เลย!
             </p>
           </div>
 
           {/* ── Quick React ───────────────────────────────────────────── */}
-          <section aria-labelledby="quick-react-heading" className="mb-6">
+          <section aria-labelledby="quick-react-heading" className="mb-8 animate-slide-up">
             <h2
               id="quick-react-heading"
-              className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-400"
+              className="mb-4 text-xs font-bold uppercase tracking-widest text-slate-400"
             >
               ⚡ Quick React
             </h2>
@@ -224,17 +227,17 @@ export default function StudentPage() {
           </section>
 
           {/* ── Divider ───────────────────────────────────────────────── */}
-          <div className="mb-6 flex items-center gap-3">
-            <div className="h-px flex-1 bg-slate-200" />
-            <span className="text-xs font-semibold text-slate-400">หรือ</span>
-            <div className="h-px flex-1 bg-slate-200" />
+          <div className="mb-8 flex items-center gap-4">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">หรือ</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
           </div>
 
           {/* ── Question Form ─────────────────────────────────────────── */}
-          <section aria-labelledby="question-heading">
+          <section aria-labelledby="question-heading" className="animate-slide-up" style={{ animationDelay: "100ms" }}>
             <h2
               id="question-heading"
-              className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-400"
+              className="mb-4 text-xs font-bold uppercase tracking-widest text-slate-400"
             >
               ✏️ ถามแบบละเอียด
             </h2>
@@ -242,7 +245,7 @@ export default function StudentPage() {
           </section>
 
           {/* ── Footer ────────────────────────────────────────────────── */}
-          <p className="mt-auto pt-10 text-center text-xs text-slate-400">
+          <p className="mt-auto pt-12 text-center text-xs text-slate-400 font-medium">
             WhisperHunt AI · ช่วยครูเข้าใจนักเรียนมากขึ้น 🧑‍🏫
           </p>
         </div>

@@ -1,28 +1,57 @@
 @import "tailwindcss";
 
 @theme {
-  --color-indigo-50: #f5f7ff;
-  --color-indigo-100: #ebf0ff;
-  --color-indigo-200: #d6e0ff;
-  --color-indigo-300: #adc2ff;
-  --color-indigo-400: #85a3ff;
-  --color-indigo-500: #5c85ff;
+  --color-indigo-50: #eef2ff;
+  --color-indigo-100: #e0e7ff;
+  --color-indigo-200: #c7d2fe;
+  --color-indigo-300: #a5b4fc;
+  --color-indigo-400: #818cf8;
+  --color-indigo-500: #6366f1;
   --color-indigo-600: #4f46e5;
   --color-indigo-700: #4338ca;
   --color-indigo-800: #3730a3;
   --color-indigo-900: #312e81;
 
+  --color-violet-50: #f5f3ff;
+  --color-violet-100: #ede9fe;
+  --color-violet-200: #ddd6fe;
+  --color-violet-400: #a78bfa;
+  --color-violet-500: #8b5cf6;
+  --color-violet-600: #7c3aed;
+
+  --color-fuchsia-400: #e879f9;
+  --color-fuchsia-500: #d946ef;
+
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 
   @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
+    0%,100% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse-glow {
+    0%,100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.4); }
+    50% { box-shadow: 0 0 0 12px rgba(99,102,241,0); }
+  }
+
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(24px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
   }
 }
 
 :root {
-  --background: #ffffff;
+  --background: #fafbff;
   --foreground: #0f172a;
 }
 
@@ -34,22 +63,80 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Selection */
+::selection {
+  background: rgba(99, 102, 241, 0.15);
+  color: #3730a3;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ── Utility Classes ────────────────────────────────────── */
+
 @utility bg-mesh {
-  background-color: #ffffff;
-  background-image: 
-    radial-gradient(at 0% 0%, hsla(253,16%,7%,0.05) 0, transparent 50%), 
-    radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%), 
-    radial-gradient(at 100% 0%, hsla(339,49%,30%,0.05) 0, transparent 50%);
+  background-color: #fafbff;
+  background-image:
+    radial-gradient(at 0% 0%, hsla(253,80%,70%,0.08) 0, transparent 50%),
+    radial-gradient(at 80% 0%, hsla(225,80%,65%,0.06) 0, transparent 50%),
+    radial-gradient(at 50% 100%, hsla(339,80%,65%,0.05) 0, transparent 50%);
   background-attachment: fixed;
 }
 
 @utility glass-card {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+@utility glass-card-strong {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(24px) saturate(2);
+  -webkit-backdrop-filter: blur(24px) saturate(2);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 @utility animate-float {
   animation: float 6s ease-in-out infinite;
+}
+
+@utility animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+@utility animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out both;
+}
+
+@utility animate-slide-up {
+  animation: slide-up 0.4s ease-out both;
+}
+
+@utility animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@utility text-gradient {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6, #d946ef);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@utility gradient-hero {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+}
+
+@utility gradient-card {
+  background: linear-gradient(135deg, rgba(99,102,241,0.05), rgba(139,92,246,0.05));
+}
+
+/* Print */
+@media print {
+  body { background: white !important; }
+  .print\:hidden { display: none !important; }
 }

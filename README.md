@@ -1,16 +1,31 @@
-# 🤫 WhisperHunt AI v1.1
+# 🤫 WhisperHunt AI v1.2
 ### *Bridging the Silence in the Classroom with RAG & Gemini 2.5 Flash*
 
 [![Next.js 16](https://img.shields.io/badge/Frontend-Next.js%2016-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/Language-TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Gemini AI](https://img.shields.io/badge/AI-Gemini%202.5%20Flash-blue?style=for-the-badge&logo=google-gemini)](https://deepmind.google/technologies/gemini/)
 [![Supabase](https://img.shields.io/badge/Database-Supabase%20(pgvector)-3ECF8E?style=for-the-badge&logo=supabase)](https://supabase.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 **WhisperHunt AI** transforms passive classrooms into data-driven learning environments. By leveraging **Retrieval-Augmented Generation (RAG)**, it captures anonymous student feedback, maps it to specific lecture slides via vector search, and delivers high-impact "Insight Clusters" to teachers in real-time.
 
 ---
 
-## 🚀 What's New in v1.1
+## 📑 Table of Contents
+1. [What's New in v1.2](#-whats-new-in-v12)
+2. [Core Pillars](#-core-pillars)
+3. [Technical Architecture](#-technical-architecture)
+4. [Experience Walkthrough](#-experience-walkthrough)
+5. [Tech Stack](#-tech-stack)
+6. [Deployment & Local Setup](#-deployment--local-setup)
+7. [Team & Credits](#-team--credits)
+
+---
+
+## 🚀 What's New in v1.2
+- **Enhanced Teacher Dashboard:** Beautiful new glassmorphism interface with time-based greetings, active class stats cards, and redesigned grid layouts.
+- **Smart QR Code Sharing:** Upgraded modal allows teachers to instantly copy the join link alongside the QR code with smooth entrance animations.
 - **Next.js 16 & Tailwind CSS 4:** Bleeding-edge frontend performance and styling.
 - **Gemini 2.5 Flash Integration:** Faster, more accurate semantic clustering and re-explanation strategies.
 - **Quick React (🥺):** One-tap signaling for instant "I'm lost" feedback.
@@ -86,8 +101,9 @@ graph TD
 - **AI Insight Board:** 
     - **Clustered Issues:** AI groups similar student questions into logical "Issue Clusters".
     - **Slide Mapping:** Automatically identifies which slide corresponds to the confusion.
-    - **Actionable Suggestions:** Provides specific strategies to re-explain the concept.
+    - **Actionable Suggestions:** Provides specific strategies to re-explain the concept (Analogies, Check-up Questions, Socratic Guides).
 - **Live Stats:** Monitor total signals and urgent issues in real-time.
+- **Instant Sharing:** Share the class instantly via the newly enhanced quick-copy URL and QR Code modal.
 
 ---
 
@@ -112,6 +128,13 @@ SUPABASE_URL=your_url
 SUPABASE_KEY=your_key
 ```
 
+Add these to `.env.local` (Frontend):
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
+```
+
 ### 2. Database Sync
 Apply `setupdata.sql` in the Supabase SQL Editor to:
 1. Enable `pgvector`.
@@ -129,4 +152,10 @@ npm install && npm run dev
 ```
 
 ---
+
+## 🏆 Team & Credits
+
 *Developed for **OTTC Hackathon 2026** · Focused on Pedagogy and AI Excellence.*
+
+Built by the WhisperHunt Team. Leveraging the incredible power of Google's Gemini Models to solve real-world educational friction points.
+
